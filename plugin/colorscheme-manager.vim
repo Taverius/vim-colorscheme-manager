@@ -1,6 +1,6 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 17, 2014
+" Last Change: June 19, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
 " Easy(er) management of the vim-colorscheme-switcher blacklist, automatic
@@ -84,6 +84,7 @@ endif
 " Define commands
 command! -bar -bang BlacklistAddColorScheme call colorscheme_manager#add_blacklist()
 command! -bar -bang BlacklistRemColorScheme call colorscheme_manager#rem_blacklist()
+command! -bar -bang BlacklistPruneColorScheme call colorscheme_manager#prune_blacklist()
 
 
 

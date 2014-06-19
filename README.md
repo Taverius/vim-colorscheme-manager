@@ -44,6 +44,10 @@ Blacklist the current colorscheme and cycle forwards or backwards once. See `g:c
 
 Remove the current colorscheme from the blacklist.
 
+### The `:BlacklistPruneColorScheme` command
+
+Removes non-existent colorschemes from blacklist.
+
 ## Options
 
 The colorscheme manager plug-in should work out of the box, but you can change the configuration defaults if you want to change how the plug-in works.

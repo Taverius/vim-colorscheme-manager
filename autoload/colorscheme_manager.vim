@@ -75,6 +75,48 @@ endfunction
 
 
 
+" Prune the blacklist of nonexistent colorschemes
+function! colorscheme_manager#prune_blacklist()
+    if exists('g:colorscheme_switcher_exclude') && len(g:colorscheme_switcher_exclude)
+        " Copy current blacklist
+        let l:blacklist = g:colorscheme_switcher_exclude
+
+        " Abuse colorscheme-switcher to get the list of all colorschemes
+        let g:colorscheme_switcher_exclude = []
+        let l:all = xolox#colorscheme_switcher#find_names()
+        let g:colorscheme_switcher_exclude = l:blacklist
+
+        let l:list = []
+        let l:pruned = []
+        " Filter blacklist
+        for l:name in l:blacklist
+            let l:keep = index(l:all, l:name) != -1
+            echo l:name.l:keep
+
+            if l:keep && index(l:list, l:name) == -1
+                call add(l:list, l:name)
+            elseif !l:keep && index(l:pruned, l:name) == -1
+                call add(l:pruned, l:name)
+            endif
+        endfor
+
+        " Sort them both
+        call sort(l:list, 1)
+        call sort(l:pruned, 1)
+
+        " If we pruned any, update the global blacklist, write file, and
+        " message user
+        if len(l:pruned)
+            let g:colorscheme_switcher_exclude = l:list
+            call colorscheme_manager#write()
+
+            call xolox#misc#msg#info('colorscheme-manager.vim %s: Pruned %s from blacklist (%i/%i)', g:colorscheme_manager#version, substitute(string(l:pruned), '\[\|\]\|''', '', 'g'), len(l:pruned), len(l:blacklist))
+        endif
+    endif
+endfunction
+
+
+
 " This function adds the current colorscheme to the blacklist
 function! colorscheme_manager#add_blacklist()
     " Check the variables exist, and that the scheme is not already in the
@@ -91,7 +133,7 @@ function! colorscheme_manager#add_blacklist()
 
         " add colorscheme to blacklist and sort it
         call add(g:colorscheme_switcher_exclude, l:prev_name)
-        call sort(g:colorscheme_switcher_exclude)
+        call sort(g:colorscheme_switcher_exclude, 1)
 
         " write the file
         call colorscheme_manager#write()
@@ -112,7 +154,7 @@ function! colorscheme_manager#rem_blacklist()
 
         " Remove the colorscheme from the blacklist and sort it
         call tlib#list#RemoveAll(g:colorscheme_switcher_exclude, g:colors_name)
-        call sort(g:colorscheme_switcher_exclude)
+        call sort(g:colorscheme_switcher_exclude, 1)
 
         " Write the file
         call colorscheme_manager#write()
