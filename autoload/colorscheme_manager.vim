@@ -3,7 +3,7 @@
 " Last Change: June 19, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
-let g:colorscheme_manager#version = '0.0.2'
+let g:colorscheme_manager#version = '0.0.3'
 
 
 
@@ -121,9 +121,7 @@ endfunction
 function! colorscheme_manager#add_blacklist()
     " Check the variables exist, and that the scheme is not already in the
     " blacklist
-    if exists('g:colors_name') \
-        && exists('g:colorscheme_switcher_exclude') \
-        && !colorscheme_manager#check_blacklist(g:colors_name)
+    if exists('g:colors_name') && exists('g:colorscheme_switcher_exclude') && !colorscheme_manager#check_blacklist(g:colors_name)
 
         " colorscheme-switcher will go back to the first scheme in the list if
         " the user cycles while on a blacklisted scheme. store the current
