@@ -1,17 +1,9 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 19, 2014
+" Last Change: June 21, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
-let g:colorscheme_manager#version = '0.0.3'
-
-
-
-" Global name of last scheme loaded
-" Used if g:colorscheme_manager_global_last = 1
-if !exists('g:colorscheme_manager#last_scheme')
-    let g:colorscheme_manager#last_scheme = ''
-endif
+let g:colorscheme_manager#version = '0.0.5'
 
 
 
@@ -54,6 +46,11 @@ function! colorscheme_manager#write()
     let l:data['last'] = exists('g:colors_name') ? g:colors_name : ''
     let l:data['blacklist'] = exists('g:colorscheme_switcher_exclude') ? g:colorscheme_switcher_exclude : []
 
+    " Write to last to global if enabled
+    if g:colorscheme_manager_global_last
+        let g:ColorschemeManagerLast = l:data['last']
+    endif
+
     " write to file
     call tlib#persistent#Save(s:data_file, l:data)
 endfunction
@@ -77,7 +74,8 @@ endfunction
 
 " Prune the blacklist of nonexistent colorschemes
 function! colorscheme_manager#prune_blacklist()
-    if exists('g:colorscheme_switcher_exclude') && len(g:colorscheme_switcher_exclude)
+    if exists('g:colorscheme_switcher_exclude') &&
+                \ len(g:colorscheme_switcher_exclude)
         " Copy current blacklist
         let l:blacklist = g:colorscheme_switcher_exclude
 
@@ -110,7 +108,12 @@ function! colorscheme_manager#prune_blacklist()
             let g:colorscheme_switcher_exclude = l:list
             call colorscheme_manager#write()
 
-            call xolox#misc#msg#info('colorscheme-manager.vim %s: Pruned %s from blacklist (%i/%i)', g:colorscheme_manager#version, substitute(string(l:pruned), '\[\|\]\|''', '', 'g'), len(l:pruned), len(l:blacklist))
+            call xolox#misc#msg#info(
+                        \ 'colorscheme-manager.vim %s: Pruned %s from blacklist (%i/%i)',
+                        \ g:colorscheme_manager#version,
+                        \ substitute(string(l:pruned), '\[\|\]\|''', '', 'g'),
+                        \ len(l:pruned),
+                        \ len(l:blacklist))
         endif
     endif
 endfunction
@@ -118,90 +121,64 @@ endfunction
 
 
 " This function adds the current colorscheme to the blacklist
-function! colorscheme_manager#add_blacklist()
+function! colorscheme_manager#add_blacklist(...)
+    let l:color = a:0 ? a:1 : ( exists('g:colors_name') ? g:colors_name : '' )
     " Check the variables exist, and that the scheme is not already in the
     " blacklist
-    if exists('g:colors_name') && exists('g:colorscheme_switcher_exclude') && !colorscheme_manager#check_blacklist(g:colors_name)
+    if strlen(l:color) &&
+                \ exists('g:colorscheme_switcher_exclude') &&
+                \ !colorscheme_manager#check_blacklist(l:color)
 
         " colorscheme-switcher will go back to the first scheme in the list if
-        " the user cycles while on a blacklisted scheme. store the current
-        " scheme name and cycle once to prevent this
-        let l:prev_name = g:colors_name
+        " the user cycles while on a blacklisted scheme. cycle once to prevent
+        " this
         call xolox#colorscheme_switcher#cycle(g:colorscheme_manager_blacklist_direction)
 
         " add colorscheme to blacklist and sort it
-        call add(g:colorscheme_switcher_exclude, l:prev_name)
+        call add(g:colorscheme_switcher_exclude, l:color)
         call sort(g:colorscheme_switcher_exclude, 1)
 
         " write the file
         call colorscheme_manager#write()
 
         " be nice and let the user know what happened
-        call xolox#misc#msg#info('colorscheme-manager.vim %s: Added color scheme %s to blacklist (%i/%i)', g:colorscheme_manager#version, l:prev_name, index(g:colorscheme_switcher_exclude, l:prev_name) + 1, len(g:colorscheme_switcher_exclude))
+        call xolox#misc#msg#info(
+                    \ 'colorscheme-manager.vim %s: Added color scheme %s to blacklist (%i/%i)',
+                    \ g:colorscheme_manager#version,
+                    \ l:color,
+                    \ index(g:colorscheme_switcher_exclude, l:color) + 1,
+                    \ len(g:colorscheme_switcher_exclude))
+        return 1
     endif
+    return 0
 endfunction
 
 
 
 " This function removes the current colorscheme from the blacklist
-function! colorscheme_manager#rem_blacklist()
+function! colorscheme_manager#rem_blacklist(...)
+    let l:color = a:0 ? a:1 : ( exists('g:colors_name') ? g:colors_name : '' )
     " Check the variables exist, and that the scheme is in the blacklist
-    if exists('g:colors_name') \
-        && exists('g:colorscheme_switcher_exclude') \
-        && colorscheme_manager#check_blacklist(g:colors_name)
+    if strlen(l:color) &&
+                \ exists('g:colorscheme_switcher_exclude') &&
+                \ colorscheme_manager#check_blacklist(l:color)
 
         " Remove the colorscheme from the blacklist and sort it
-        call tlib#list#RemoveAll(g:colorscheme_switcher_exclude, g:colors_name)
+        call tlib#list#RemoveAll(g:colorscheme_switcher_exclude, l:color)
         call sort(g:colorscheme_switcher_exclude, 1)
 
         " Write the file
         call colorscheme_manager#write()
 
         " Be nice and let the user know what happened
-        call xolox#misc#msg#info('colorscheme-manager.vim %s: Removed color scheme %s to blacklist (%i)', g:colorscheme_manager#version, g:colors_name, len(g:colorscheme_switcher_exclude))
+        call xolox#misc#msg#info(
+                    \ 'colorscheme-manager.vim %s: Removed color scheme %s to blacklist (%i)',
+                    \ g:colorscheme_manager#version,
+                    \ l:color,
+                    \ len(g:colorscheme_switcher_exclude))
+        return 1
     endif
-endfunction
-
-
-
-" This function loads a given colorscheme, with all the bells and whistles
-" from vim-colorscheme-switcher
-" :def: function! colorscheme_manager#load(colorscheme, ?filter=0)
-function! colorscheme_manager#load(scheme, ...)
-    let l:filter = a:0 >= 1 ? a:1 : 0
-
-    if l:filter
-        " Get the list of non-blacklisted schemes
-        let l:list = xolox#colorscheme_switcher#find_names()
-
-        " Is the saved scheme not blacklisted?
-        let l:color = !colorscheme_manager#check_blacklist(a:scheme) ? a:scheme : l:list[0]
-    else
-        let l:color = a:scheme
-    endif
-
-    " Save highlight group links
-    " Check for existing colorscheme name, since this may be called on vim
-    " start
-    if exists('g:colors_name')
-        let l:links = 1
-        call xolox#colorscheme_switcher#find_links()
-    endif
-
-    " Enable it
-    execute 'colorscheme' fnameescape(l:color)
-
-    " Restore highlight group links
-    if exists('l:links')
-        call xolox#colorscheme_switcher#restore_links()
-    endif
-
-    " Store the name
-    let g:colors_name = l:color
-    let g:colorscheme_manager#last_scheme = l:color
-
-    " Run autocommands
-    silent execute 'doautocmd ColorScheme' fnameescape(l:color)
+    return 0
 endfunction
 
 
@@ -214,7 +191,7 @@ function! colorscheme_manager#init()
 
     " Load last from global if set to do so
     if g:colorscheme_manager_global_last
-        let l:last = g:colorscheme_manager#last_scheme
+        let l:last = g:ColorschemeManagerLast
     endif
 
     " Read from file
@@ -238,8 +215,14 @@ function! colorscheme_manager#init()
 
     " Is the last scheme used non-empty?
     if strlen(l:last)
-        call colorscheme_manager#load(l:last, 1)
+        " Get the list of non-blacklisted schemes
+        let l:list = xolox#colorscheme_switcher#find_names()
+
+        " Is the saved scheme not blacklisted?
+        let l:last = !colorscheme_manager#check_blacklist(l:last) ? l:last : l:list[0]
+
+        call xolox#colorscheme_switcher#switch_to(l:last)
     endif
 endfunction
 
-" vim: ts=4 sw=4
+" vim: sw=4 et

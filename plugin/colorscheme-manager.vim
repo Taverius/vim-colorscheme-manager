@@ -1,6 +1,6 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 19, 2014
+" Last Change: June 21, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
 " Easy(er) management of the vim-colorscheme-switcher blacklist, automatic
@@ -30,6 +30,9 @@ catch
     finish
 endtry
 
+" Loaded, don't do it again
+let g:loaded_colorscheme_manager = g:colorscheme_manager#version
+
 
 
 " Set autocommands
@@ -52,6 +55,11 @@ endif
 if !exists('g:colorscheme_manager_global_last')
     let g:colorscheme_manager_global_last = 0
 endif
+" Global name of last scheme loaded
+" Used if g:colorscheme_manager_global_last = 1
+if !exists('g:ColorschemeManagerLast')
+    let g:ColorschemeManagerLast = ''
+endif
 
 
 
@@ -73,22 +81,22 @@ endif
 
 " Define maps unless disabled
 if g:colorscheme_manager_define_mappings
-    inoremap <silent> <C-F8> <C-O>:BlacklistAddColorScheme<CR>
-    nnoremap <silent> <C-F8> :BlacklistAddColorScheme<CR>
-    inoremap <silent> <M-F8> <C-O>:BlacklistRemColorScheme<CR>
-    nnoremap <silent> <M-F8> :BlacklistRemColorScheme<CR>
+    inoremap <silent> <F9> <C-O>:BlacklistAddColorScheme<CR>
+    nnoremap <silent> <F9> :BlacklistAddColorScheme<CR>
+    inoremap <silent> <S-F9> <C-O>:BlacklistRemColorScheme<CR>
+    nnoremap <silent> <S-F9> :BlacklistRemColorScheme<CR>
 endif
 
 
 
 " Define commands
-command! -bar -bang BlacklistAddColorScheme call colorscheme_manager#add_blacklist()
-command! -bar -bang BlacklistRemColorScheme call colorscheme_manager#rem_blacklist()
-command! -bar -bang BlacklistPruneColorScheme call colorscheme_manager#prune_blacklist()
+command! -bar -nargs=? -complete=color
+            \ BlacklistAddColorScheme call colorscheme_manager#add_blacklist(<f-args>)
+command! -bar -nargs=? -complete=color
+            \ BlacklistRemColorScheme call colorscheme_manager#rem_blacklist(<f-args>)
+command! BlacklistPruneColorScheme call colorscheme_manager#prune_blacklist()
+command! -nargs=1 -complete=color
+            \ SwitchToColorScheme call xolox#colorscheme_switcher#switch_to(<f-args>)
 
 
-
-" Loaded, don't do it again
-let g:loaded_colorscheme_manager = g:colorscheme_manager#version
-
-" vim: ts=4 sw=4
+" vim: sw=4 et
