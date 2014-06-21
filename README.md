@@ -17,19 +17,19 @@ Requires [tlib](http://github.com/tomtom/tlib_vim), must be installed separately
 ### Manually
 1. Put all files under $VIM.
 
-### [Pathogen](https://github.com/tpope/vim-pathogen)
+### [Pathogen](http://github.com/tpope/vim-pathogen)
 1. Install with the following command.
 
         git clone https://github.com/Taverius/vim-colorscheme-manager ~/.vim/bundle/vim-colorscheme-manager
 
-### [Vundle](https://github.com/gmarik/Vundle.vim)
+### [Vundle](http://github.com/gmarik/Vundle.vim)
 1. Add the following configuration to your `.vimrc`.
 
         Plugin 'Taverius/vim-colorscheme-manager'
 
 2. Install with `:PluginInstall`.
 
-### [NeoBundle](https://github.com/Shougo/neobundle.vim)
+### [NeoBundle](http://github.com/Shougo/neobundle.vim)
 1. Add the following configuration to your `.vimrc`.
 
         NeoBundle 'Taverius/vim-colorscheme-manager', {
