@@ -1,18 +1,18 @@
 # Color scheme manager for Vim
 
-An add-on for [vim-colorscheme-switcher](https://github.com/xolox/vim-colorscheme-switcher).
+An add-on for [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme-switcher).
 
 * Convenience functions for managing the colorscheme blacklist.
 * Automatically load last used colorscheme upon starting vim or (optionally) loading a session.
-* Store last used colorscheme and blacklist on file, using [tlib](https://github.com/tomtom/tlib_vim).
+* Store last used colorscheme and blacklist on file, using [tlib](http://github.com/tomtom/tlib_vim).
 
 ## Author
-[Taverius](https://github.com/Taverius)
+[Taverius](http://github.com/Taverius)
 
 ## Installation
-Requires [vim-colorscheme-switcher](https://github.com/xolox/vim-colorscheme-switcher)[vim-colorscheme-switcher](https://github.com/xolox/vim-colorscheme-switcher), must be installed separately.
+Requires [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme-switcher), must be installed separately.
 
-Requires [tlib](https://github.com/tomtom/tlib_vim), must be installed separately.
+Requires [tlib](http://github.com/tomtom/tlib_vim), must be installed separately.
 
 ### Manually
 1. Put all files under $VIM.
@@ -62,7 +62,7 @@ Removes non-existent colorschemes from blacklist.
 
 Syntactic sugar for `xolox#colorscheme_switcher#switch_to(colorscheme)`, takes a colorscheme name as argument.
 
-Useful for switching to a colorscheme you just installed with Vundle/NeoBundle/etc, or to use as custom command for a colorscheme browser - for example, [unite.vim](https://github.com/Shougo/unite.vim) with [unite-colorscheme](https://github.com/ujihisa/unite-colorscheme)
+Useful for switching to a colorscheme you just installed with Vundle/NeoBundle/etc, or to use as custom command for a colorscheme browser - for example, [unite.vim](http://github.com/Shougo/unite.vim) with [unite-colorscheme](http://github.com/ujihisa/unite-colorscheme)
 
 ## Options
 
