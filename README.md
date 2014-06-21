@@ -56,7 +56,7 @@ Optionally, takes a colorscheme name as an argument, and operates on that instea
 
 ### The `:BlacklistPruneColorScheme` command
 
-Removes non-existent colorschemes from blacklist.
+Removes non-existent (i.e. not in runtime path) colorschemes from blacklist.
 
 ### The `:SwitchToColorScheme` command
 
@@ -72,31 +72,31 @@ The plug-in *should* work out of the box, but you can change the configuration d
 
 By default the plug-in maps the following keys in insert and normal mode:
 
-- `F9` to add the current colorscheme to the blacklist
-- `Shift-F9` to remove the current colorscheme from the blacklist
+- `F9` adds the current colorscheme to the blacklist
+- `Shift-F9` removes the current colorscheme from the blacklist
 
 To disable these mappings (e.g. because you're already using them for a different purpose) you can set the option `g:colorscheme_manager_define_mappings` to 0 (false) in your vimrc.
 
 ### The `g:colorscheme_manager_blacklist_direction` option
 
-By default the plug-in cycles forward one colorscheme when adding the current to the blacklist.
+By default the plug-in cycles forward one colorscheme when adding the current one to the blacklist.
 
-By setting the option `g:colorscheme_manager_blacklist_direction` to 0 in your vimrc, it will instead cycle to the previous colorscheme upon blacklisting the current one.
+If you set this variable to 0 (false), it will instead cycle backwards.
 
 ### The `g:colorscheme_manager_global_last` option
 
 By default the plug-in reads both blacklist and last colorscheme from file.
 
-By setting the `g:colorscheme_manager_global_last` option to 1 in your vimrc, a global variable will take precedence unless empty.
+If you set this option to 1 (true) in your `vimrc`, a global variable will take precedence unless empty.
 
 Together with vim sessions with the option to store global variables enabled, this allows you to have a different colorscheme for each vim session.
 
-### The `g:ColorschemeManagerLast` String
+### The `g:ColorschemeManagerLast` option
 
-This is where the last used colorscheme is saved if `g:colorscheme_manager_global_last` is 1.
+This option is a string specifying the last the last used colorscheme.
+It will be written to by the plug-in if `g:colorscheme_manager_global_last` is 1 (true).
 
-Will be saved in vim sessions if `sessionoptions` contains `globals`.
-
+If `sessionoptions` contains `globals`, `:mksession` will store this variable in the session file.
 
 ## License
 
