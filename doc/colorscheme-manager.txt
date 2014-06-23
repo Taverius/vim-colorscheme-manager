@@ -109,7 +109,7 @@ Together with vim sessions with the option to store global variables enabled,
 this allows you to have a different colorscheme for each vim session.
 
 -------------------------------------------------------------------------------
-The *g:colorscheme_switcher_command* option
+The *g:ColorschemeManagerLast* option
 
 This option is a string specifying the last the last used colorscheme.
 It will be written to by the plug-in if |g:colorscheme_manager_global_last|
