@@ -1,6 +1,6 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 21, 2014
+" Last Change: June 25, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
 " Easy(er) management of the vim-colorscheme-switcher blacklist, automatic
@@ -12,6 +12,15 @@ if &cp || exists('g:loaded_colorscheme_manager') || version < 700 || ! has('auto
     finish
 endif
 
+" Make sure vim-misc is installed.
+try
+    call type(g:xolox#misc#version)
+catch
+    echomsg "Warning: The vim-colorscheme-manager plug-in requires the vim-misc plug-in which seems not to be installed! For more information please review the installation instructions in the readme (also available on the homepage and on GitHub). The vim-colorscheme-switcher plug-in will now be disabled."
+    let g:loaded_colorscheme_manager = -1
+    finish
+endtry
+
 " Make sure vim-colorscheme-switcher is installed
 try
     call type(g:xolox#colorscheme_switcher#version)
@@ -21,17 +30,8 @@ catch
     finish
 endtry
 
-" Make sure tlib is installed
-try
-    call type(g:tlib#debug)
-catch
-    echoerr 'Warning: The vim-colorscheme-manager plug-in requires the tlib plug-in which seems not to be installed! For more information please review the installation instructions in the readme (also available on Github). The vim-colorscheme-manager plug-in will now be disabled.'
-    let g:loaded_colorscheme_manager = -1
-    finish
-endtry
-
 " Loaded, don't do it again
-let g:loaded_colorscheme_manager = g:colorscheme_manager#version
+let g:loaded_colorscheme_manager = 1
 
 
 
@@ -67,6 +67,16 @@ endif
 " blacklist, rather than forwards
 if !exists('g:colorscheme_manager_blacklist_direction')
     let g:colorscheme_manager_blacklist_direction = 1
+endif
+
+
+
+" Set this to override the file where the last colorscheme and the blacklist
+" are stored
+if !exists('g:colorscheme_manager_file')
+    let g:colorscheme_manager_file = xolox#misc#os#is_win() ?
+                \ '~/vimfiles/.colorscheme' :
+                \ '~/.vim/.colorscheme'
 endif
 
 

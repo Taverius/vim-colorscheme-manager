@@ -1,9 +1,9 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 21, 2014
+" Last Change: June 25, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
-let g:colorscheme_manager#version = '0.0.5'
+let g:colorscheme_manager#version = '0.0.6'
 
 
 
@@ -14,12 +14,6 @@ endif
 if !exists('s:data_file')
     let s:data_file = ''
 endif
-if !exists('s:data_path')
-    let s:data_path = 'colorscheme-manager'
-endif
-if !exists('s:data_type')
-    let s:data_type = 'cache'
-endif
 if !exists('s:data_default')
     let s:data_default = { 'last': '', 'blacklist': []}
 endif
@@ -29,17 +23,30 @@ endif
 " This function returns the filename used for persistence, and creates the
 " necessary directory structure if needed
 function! colorscheme_manager#filename()
-    " get filename, and create directory if needed
-    return tlib#persistent#Filename(s:data_path, s:data_type, 1)
+    let l:fname = expand(g:colorscheme_manager_file)
+    let l:fpath = fnamemodify(l:fname, ":p:h")
+
+    " Try to create directory if it does not exist
+    if exists('*mkdir') && !isdirectory(l:fpath)
+        try
+            call mkdir(l:fpath, 'p')
+        catch /^Vim\%((\a\+)\)\=:E739:/
+            if filereadable(l:fpath) && !isdirectory(l:fpath)
+                call xolox#misc#msg#warn(
+                        \ 'colorscheme-manager.vim %s: Could not create directory %s for cache file %s because a file with the same exists. Please delete it.',
+                        \ g:colorscheme_manager#version,
+                        \ l:fpath,
+                        \ fnamemodify(l:fname, ":p:t"))
+            endif
+        endtry
+    endif
+    return l:fname
 endfunction
 
 
 
 " This function writes the last colorscheme and blacklist to file
 function! colorscheme_manager#write()
-    " make sure the directory is present
-    call colorscheme_manager#filename()
-
     let l:data = s:data_default
 
     " populate data
@@ -52,14 +59,14 @@ function! colorscheme_manager#write()
     endif
 
     " write to file
-    call tlib#persistent#Save(s:data_file, l:data)
+    call xolox#misc#persist#save(s:data_file, l:data)
 endfunction
 
 
 
 " This function reads the last colorscheme and blacklist from file
 function! colorscheme_manager#read()
-    return tlib#persistent#Get(s:data_file, s:data_default)
+    return xolox#misc#persist#load(s:data_file, s:data_default)
 endfunction
 
 
@@ -132,7 +139,9 @@ function! colorscheme_manager#add_blacklist(...)
         " colorscheme-switcher will go back to the first scheme in the list if
         " the user cycles while on a blacklisted scheme. cycle once to prevent
         " this
-        call xolox#colorscheme_switcher#cycle(g:colorscheme_manager_blacklist_direction)
+        if l:color == g:colors_name
+            call xolox#colorscheme_switcher#cycle(g:colorscheme_manager_blacklist_direction)
+        endif
 
         " add colorscheme to blacklist and sort it
         call add(g:colorscheme_switcher_exclude, l:color)
@@ -164,7 +173,7 @@ function! colorscheme_manager#rem_blacklist(...)
                 \ colorscheme_manager#check_blacklist(l:color)
 
         " Remove the colorscheme from the blacklist and sort it
-        call tlib#list#RemoveAll(g:colorscheme_switcher_exclude, l:color)
+        call filter(g:colorscheme_switcher_exclude, 'v:val != "'.l:color.'"')
         call sort(g:colorscheme_switcher_exclude, 1)
 
         " Write the file
