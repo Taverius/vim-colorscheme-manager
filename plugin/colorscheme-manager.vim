@@ -40,11 +40,11 @@ augroup ColorschemeManager
     autocmd!
     autocmd VimEnter * call colorscheme_manager#init()
     autocmd ColorScheme * call colorscheme_manager#write()
-augroup end
+augroup END
 if has('mksession')
     augroup ColorschemeManager
         autocmd SessionLoadPost * call colorscheme_manager#init()
-    augroup end
+    augroup END
 endif
 
 
