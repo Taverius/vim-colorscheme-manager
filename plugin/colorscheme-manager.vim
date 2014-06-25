@@ -1,11 +1,11 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 25, 2014
+" Last Change: June 26, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
 " Easy(er) management of the vim-colorscheme-switcher blacklist, automatic
 " loading of last used colorscheme on vim enter, on-file persistence of
-" blacklist and llast colorscheme.
+" blacklist and last colorscheme.
 " Still pretty minimalist.
 
 if &cp || exists('g:loaded_colorscheme_manager') || version < 700 || ! has('autocmd')
@@ -29,55 +29,6 @@ catch
     let g:loaded_colorscheme_manager = -1
     finish
 endtry
-
-" Loaded, don't do it again
-let g:loaded_colorscheme_manager = 1
-
-
-
-" Set autocommands
-augroup ColorschemeManager
-    autocmd!
-    autocmd VimEnter * call colorscheme_manager#init()
-    autocmd ColorScheme * call colorscheme_manager#write()
-augroup END
-if has('mksession')
-    augroup ColorschemeManager
-        autocmd SessionLoadPost * call colorscheme_manager#init()
-    augroup END
-endif
-
-
-
-" Set this to 1 to use a global variable for storing the last colorscheme
-" instead of the file. Lets you store the last colorscheme on a per-session
-" basis
-if !exists('g:colorscheme_manager_global_last')
-    let g:colorscheme_manager_global_last = 0
-endif
-" Global name of last scheme loaded
-" Used if g:colorscheme_manager_global_last = 1
-if !exists('g:ColorschemeManagerLast')
-    let g:ColorschemeManagerLast = ''
-endif
-
-
-
-" Set this to 0 to cycle backwards when adding the current colorscheme to the
-" blacklist, rather than forwards
-if !exists('g:colorscheme_manager_blacklist_direction')
-    let g:colorscheme_manager_blacklist_direction = 1
-endif
-
-
-
-" Set this to override the file where the last colorscheme and the blacklist
-" are stored
-if !exists('g:colorscheme_manager_file')
-    let g:colorscheme_manager_file = xolox#misc#os#is_win() ?
-                \ '~/vimfiles/.colorscheme' :
-                \ '~/.vim/.colorscheme'
-endif
 
 
 
@@ -108,5 +59,21 @@ command! BlacklistPruneColorScheme call colorscheme_manager#prune_blacklist()
 command! -nargs=1 -complete=color
             \ SwitchToColorScheme call xolox#colorscheme_switcher#switch_to(<f-args>)
 
+
+
+" Set autocommands
+augroup ColorschemeManager
+    autocmd!
+    autocmd VimEnter * call colorscheme_manager#init()
+    autocmd ColorScheme * call colorscheme_manager#write()
+augroup END
+if has('mksession')
+    augroup ColorschemeManager
+        autocmd SessionLoadPost * call colorscheme_manager#init()
+    augroup END
+endif
+
+" Loaded, don't do it again
+let g:loaded_colorscheme_manager = 1
 
 " vim: sw=4 et

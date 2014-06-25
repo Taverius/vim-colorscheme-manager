@@ -1,10 +1,28 @@
 " Vim plug-in
 " Maintainer: Leonardo Valeri Manera <lvalerimanera@gmail.com>
-" Last Change: June 25, 2014
+" Last Change: June 26, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
-let g:colorscheme_manager#version = '0.0.6'
+let g:colorscheme_manager#version = '0.0.7'
 
+" Global variables
+" Saving and loading of colorscheme from global
+if !exists('g:colorscheme_manager_global_last')
+    let g:colorscheme_manager_global_last = 0
+endif
+if !exists('g:ColorschemeManagerLast')
+    let g:ColorschemeManagerLast = ''
+endif
+" Cycle forward or backward on blacklist current colorscheme
+if !exists('g:colorscheme_manager_blacklist_direction')
+    let g:colorscheme_manager_blacklist_direction = 1
+endif
+" Persistence file location
+if !exists('g:colorscheme_manager_file')
+    let g:colorscheme_manager_file = xolox#misc#os#is_win() ?
+                \ '~/vimfiles/.colorscheme' :
+                \ '~/.vim/.colorscheme'
+endif
 
 
 " Script variables
@@ -20,8 +38,8 @@ endif
 
 
 
-" This function returns the filename used for persistence, and creates the
-" necessary directory structure if needed
+" Return the filename used for persistence, and create the necessary
+" directory structure if needed
 function! colorscheme_manager#filename()
     let l:fname = expand(g:colorscheme_manager_file)
     let l:fpath = fnamemodify(l:fname, ":p:h")
@@ -45,7 +63,7 @@ endfunction
 
 
 
-" This function writes the last colorscheme and blacklist to file
+" Write the last colorscheme and blacklist to file
 function! colorscheme_manager#write()
     let l:data = s:data_default
 
@@ -64,15 +82,14 @@ endfunction
 
 
 
-" This function reads the last colorscheme and blacklist from file
+" Read the last colorscheme and blacklist from file
 function! colorscheme_manager#read()
     return xolox#misc#persist#load(s:data_file, s:data_default)
 endfunction
 
 
 
-" This function checks for the presence of a colorscheme in the blacklist
-" Its used internally, but can also be used in statusline, I guess?
+" Check for the presence of a colorscheme in the blacklist
 function! colorscheme_manager#check_blacklist(check_scheme)
     return index(g:colorscheme_switcher_exclude, a:check_scheme) >= 0 ? 1 : 0
 endfunction
@@ -127,7 +144,7 @@ endfunction
 
 
 
-" This function adds the current colorscheme to the blacklist
+" Add the current colorscheme to the blacklist
 function! colorscheme_manager#add_blacklist(...)
     let l:color = a:0 ? a:1 : ( exists('g:colors_name') ? g:colors_name : '' )
     " Check the variables exist, and that the scheme is not already in the
@@ -164,7 +181,7 @@ endfunction
 
 
 
-" This function removes the current colorscheme from the blacklist
+" Remove the current colorscheme from the blacklist
 function! colorscheme_manager#rem_blacklist(...)
     let l:color = a:0 ? a:1 : ( exists('g:colors_name') ? g:colors_name : '' )
     " Check the variables exist, and that the scheme is in the blacklist
@@ -192,8 +209,7 @@ endfunction
 
 
 
-" This function is called at vim start or when loading a session, and takes
-" care of initial setup and switching to the last used colorscheme
+" Initialize plugin state, load last colorscheme
 function! colorscheme_manager#init()
     let l:data = s:data_default
     let l:last = ''
