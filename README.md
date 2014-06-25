@@ -4,7 +4,7 @@ An add-on for [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme
 
 * Convenience functions for managing the colorscheme blacklist.
 * Automatically load last used colorscheme upon starting vim or (optionally) loading a session.
-* Store last used colorscheme and blacklist on file, using [tlib](http://github.com/tomtom/tlib_vim).
+* Store last used colorscheme and blacklist on file.
 
 ## Author
 [Taverius](http://github.com/Taverius)
@@ -12,7 +12,7 @@ An add-on for [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme
 ## Installation
 Requires [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme-switcher), must be installed separately.
 
-Requires [tlib](http://github.com/tomtom/tlib_vim), must be installed separately.
+Requires [vim-misc](http://github.com/xolox/vim-misc), must be installed separately.
 
 ### Manually
 1. Put all files under $VIM.
@@ -33,9 +33,9 @@ Requires [tlib](http://github.com/tomtom/tlib_vim), must be installed separately
 1. Add the following configuration to your `.vimrc`.
 
         NeoBundle 'Taverius/vim-colorscheme-manager', {
-							\ 'depends': [
-							\	'tomtom/tlib_vim',
-							\	'xolox/vim-colorscheme-switcher'
+							\ 	'depends' : [
+							\		'xolox/vim-misc',
+							\		'xolox/vim-colorscheme-switcher'
 							\ ]}
 
 2. Install with `:NeoBundleInstall`.
@@ -97,6 +97,17 @@ This option is a string specifying the last the last used colorscheme.
 It will be written to by the plug-in if `g:colorscheme_manager_global_last` is 1 (true).
 
 If `sessionoptions` contains `globals`, `:mksession` will store this variable in the session file.
+
+### The `g:colorscheme_manager_file` option
+
+The filename the plug-in will write its persistence data to.
+
+Defaults to:
+
+* `~/vimfiles/.colorscheme` on windows.
+* `~/.vim/.colorscheme` everywhere else.
+
+Set this to your preferred value in your `vimrc` to override the location.
 
 ## License
 

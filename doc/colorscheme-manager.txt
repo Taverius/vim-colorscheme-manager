@@ -31,7 +31,7 @@ An add-on for vim-colorscheme-switcher [2].
 - Store last used colorscheme and blacklist on file, using tlib [3].
 
 _Please note that the vim-colorscheme-manager plug-in requires the
-vim-colorscheme-switcher [2] and tlib [3] plug-ins which must be installed
+vim-colorscheme-switcher [2] and vim-misc [3] plug-ins which must be installed
 separately._
 
 ===============================================================================
@@ -118,13 +118,25 @@ is 1 (true).
 If |'sessionoptions'| contains "globals", |:mksession| will store this
 variable in the session file.
 
+-------------------------------------------------------------------------------
+The *g:colorscheme_manager_file* option
+
+The filename the plug-in will write its persistence data to.
+
+Defaults to:
+
+- '~/vimfiles/.colorscheme' on windows.
+- '~/.vim/.colorscheme' everywhere else.
+
+Set this to your preferred value in your |vimrc| to override the location.
+
 ===============================================================================
                                               *colorscheme-manager-references*
 References ~
 
 [1] http://github.com/Taverius
 [2] http://github.com/xolox/vim-colorscheme-switcher
-[3] http://github.com/tomtom/tlib_vim
+[3] http://github.com/xolox/vim-misc
 [4] http://github.com/Shougo/unite.vim
 [5] http://github.com/ujihisa/unite-colorscheme
 
