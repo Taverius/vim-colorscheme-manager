@@ -20,25 +20,27 @@ Requires [vim-misc](http://github.com/xolox/vim-misc), must be installed separat
 ### [Pathogen](http://github.com/tpope/vim-pathogen)
 1. Install with the following command.
 
-        git clone https://github.com/Taverius/vim-colorscheme-manager ~/.vim/bundle/vim-colorscheme-manager
+   ```sh
+   git clone https://github.com/Taverius/vim-colorscheme-manager ~/.vim/bundle/vim-colorscheme-manager
+   ```
 
-### [Vundle](http://github.com/gmarik/Vundle.vim)
+### [Dein.vim](https://github.com/Shougo/dein.vim)
 1. Add the following configuration to your `.vimrc`.
 
-        Plugin 'Taverius/vim-colorscheme-manager'
+   ```VimL
+   call dein#add('Taverius/vim-colorscheme-manager')
+   ```
 
-2. Install with `:PluginInstall`.
+2. Install with `:call dein#install()`.
 
-### [NeoBundle](http://github.com/Shougo/neobundle.vim)
+### [vim-plug](https://github.com/junegunn/vim-plug)
 1. Add the following configuration to your `.vimrc`.
 
-        NeoBundle 'Taverius/vim-colorscheme-manager', {
-							\ 	'depends' : [
-							\		'xolox/vim-misc',
-							\		'xolox/vim-colorscheme-switcher'
-							\ ]}
+   ```VimL
+   Plug 'Taverius/vim-colorscheme-manager'
+   ```
 
-2. Install with `:NeoBundleInstall`.
+2. Install with `:PlugInstall`.
 
 ## Commands
 
