@@ -7,6 +7,9 @@ let g:colorscheme_manager#version = '0.0.7'
 
 " Global variables
 " Saving and loading of colorscheme from global
+if !exists('g:colorscheme_switcher_exclude')
+    let g:colorscheme_switcher_exclude = []
+endif
 if !exists('g:colorscheme_manager_global_last')
     let g:colorscheme_manager_global_last = 0
 endif
