@@ -56,8 +56,15 @@ command! -bar -nargs=? -complete=color
 command! -bar -nargs=? -complete=color
             \ BlacklistRemColorScheme call colorscheme_manager#rem_blacklist(<f-args>)
 command! BlacklistPruneColorScheme call colorscheme_manager#prune_blacklist()
+command! -bar -nargs=? -complete=color
+            \ ShortlistAddColorScheme call colorscheme_manager#add_shortlist(<f-args>)
+command! -bar -nargs=? -complete=color
+            \ ShortlistRemColorScheme call colorscheme_manager#rem_shortlist(<f-args>)
+command! ShortlistPruneColorScheme call colorscheme_manager#prune_shortlist()
+command! ShortlistRandomColorScheme call xolox#colorscheme_switcher#random_among(g:colorscheme_manager_shortlist)
 command! -nargs=1 -complete=color
             \ SwitchToColorScheme call xolox#colorscheme_switcher#switch_to(<f-args>)
+command! FreshColorScheme call colorscheme_manager#fresh_colorscheme()
 
 
 
