@@ -11,7 +11,12 @@ Contents ~
   1. The |:BlacklistAddColorScheme| command
   2. The |:BlacklistRemColorScheme| command
   3. The |:BlacklistPruneColorScheme| command
-  4. The |:SwitchToColorScheme| command
+  4. The |:ShortlistAddColorScheme| command
+  5. The |:ShortlistRemColorScheme| command
+  6. The |:ShortlistPruneColorScheme| command
+  7. The |:ShortlistRandomColorScheme| command
+  8. The |:SwitchToColorScheme| command
+  9. The |:FreshColorScheme| command
  3. Options                                      |colorscheme-manager-options|
   1. The |g:colorscheme_manager_define_mappings| option
   2. The |g:colorscheme_manager_blacklist_direction| option
@@ -28,7 +33,10 @@ An add-on for vim-colorscheme-switcher [2].
 - Convenience functions for managing the colorscheme blacklist.
 - Automatically load last used colorscheme upon starting vim or
   (optionally) loading a session.
-- Store last used colorscheme and blacklist on file, using tlib [3].
+- Manage a shortlist of favorite colorschemes, including the ability to switch
+  to a random colorscheme from the shortlist
+- Store last used colorscheme, blacklist, and shortlist on file, using tlib
+  [3].
 
 _Please note that the vim-colorscheme-manager plug-in requires the
 vim-colorscheme-switcher [2] and vim-misc [3] plug-ins which must be installed
@@ -58,7 +66,35 @@ instead of the current one.
 -------------------------------------------------------------------------------
 The *:BlacklistPruneColorScheme* command
 
-Removes non-existent (i.e. not in runtime path) colorschemes from blacklist.
+Remove non-existent (i.e. not in runtime path) colorschemes from the
+blacklist.
+
+-------------------------------------------------------------------------------
+The *:ShortlistAddColorScheme* command
+
+Add the current colorscheme to the shortlist.
+
+Optionally, takes a colorscheme name as an argument, and operates on that
+instead of the current one.
+
+-------------------------------------------------------------------------------
+The *:ShortlistRemColorScheme* command
+
+Remove the current colorscheme from the shortlist.
+
+Optionally, takes a colorscheme name as an argument, and operates on that
+instead of the current one.
+
+-------------------------------------------------------------------------------
+The *:ShortlistPruneColorScheme* command
+
+Remove non-existent (i.e. not in runtime path) colorschemes from the
+shortlist.
+
+-------------------------------------------------------------------------------
+The *:ShortlistRandomColorScheme* command
+
+Switch to a random colorscheme from the shortlist.
 
 -------------------------------------------------------------------------------
 The *:SwitchToColorScheme* command
@@ -68,7 +104,13 @@ colorscheme name as argument.
 
 Useful for switching to a colorscheme you just installed with a plugin
 manager, or to use as custom command for a colorscheme browser - for example,
-unite.vim [4] with unite-colorscheme [5]
+unite.vim [4] with unite-colorscheme [5].
+
+-------------------------------------------------------------------------------
+The *:FreshColorScheme* command
+
+Similar to |:RandomColorScheme|, but switch to a random colorscheme that is
+neither in the blacklist nor in the shortlist.
 
 ===============================================================================
                                                  *colorscheme-manager-options*

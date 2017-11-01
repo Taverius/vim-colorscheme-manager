@@ -13,6 +13,9 @@ endif
 if !exists('g:colorscheme_manager_global_last')
     let g:colorscheme_manager_global_last = 0
 endif
+if !exists('g:colorscheme_manager_shortlist')
+    let g:colorscheme_manager_shortlist = []
+endif
 if !exists('g:ColorschemeManagerLast')
     let g:ColorschemeManagerLast = ''
 endif
@@ -36,8 +39,40 @@ if !exists('s:data_file')
     let s:data_file = ''
 endif
 if !exists('s:data_default')
-    let s:data_default = { 'last': '', 'blacklist': []}
+    let s:data_default = {'last': '', 'blacklist': [], 'shortlist': []}
 endif
+
+
+
+" Prune a list of nonexistent colorschemes, returning a clean list
+" and a list of defunct colorschemes
+function! s:prune_colorschemes(arg)
+    " Abuse colorscheme-switcher to get the list of all colorschemes
+    let l:excludes = g:colorscheme_switcher_exclude
+    let g:colorscheme_switcher_exclude = []
+    let l:all = xolox#colorscheme_switcher#find_names()
+    let g:colorscheme_switcher_exclude = l:excludes
+
+    let l:clean = []
+    let l:defuncts = []
+
+    " Filter argument
+    for l:name in a:arg
+        let l:keep = index(l:all, l:name) != -1
+
+        if l:keep && index(l:clean, l:name) == -1
+            call add(l:clean, l:name)
+        elseif !l:keep && index(l:defuncts, l:name) == -1
+            call add(l:defuncts, l:name)
+        endif
+    endfor
+
+    " Sort them both
+    call sort(l:clean, 1)
+    call sort(l:defuncts, 1)
+
+    return [l:clean, l:defuncts]
+endfunction
 
 
 
@@ -66,13 +101,14 @@ endfunction
 
 
 
-" Write the last colorscheme and blacklist to file
+" Write persistent data
 function! colorscheme_manager#write()
     let l:data = s:data_default
 
     " populate data
     let l:data['last'] = exists('g:colors_name') ? g:colors_name : ''
     let l:data['blacklist'] = exists('g:colorscheme_switcher_exclude') ? g:colorscheme_switcher_exclude : []
+    let l:data['shortlist'] = exists('g:colorscheme_manager_shortlist') ? g:colorscheme_manager_shortlist : []
 
     " Write to last to global if enabled
     if g:colorscheme_manager_global_last
@@ -103,44 +139,22 @@ endfunction
 function! colorscheme_manager#prune_blacklist()
     if exists('g:colorscheme_switcher_exclude') &&
                 \ len(g:colorscheme_switcher_exclude)
-        " Copy current blacklist
         let l:blacklist = g:colorscheme_switcher_exclude
-
-        " Abuse colorscheme-switcher to get the list of all colorschemes
-        let g:colorscheme_switcher_exclude = []
-        let l:all = xolox#colorscheme_switcher#find_names()
-        let g:colorscheme_switcher_exclude = l:blacklist
-
-        let l:list = []
-        let l:pruned = []
-        " Filter blacklist
-        for l:name in l:blacklist
-            let l:keep = index(l:all, l:name) != -1
-            echo l:name.l:keep
-
-            if l:keep && index(l:list, l:name) == -1
-                call add(l:list, l:name)
-            elseif !l:keep && index(l:pruned, l:name) == -1
-                call add(l:pruned, l:name)
-            endif
-        endfor
-
-        " Sort them both
-        call sort(l:list, 1)
-        call sort(l:pruned, 1)
+        let l:original_length = len(l:blacklist)
+        let [blacklist, defuncts] = s:prune_colorschemes(l:blacklist)
 
         " If we pruned any, update the global blacklist, write file, and
         " message user
-        if len(l:pruned)
-            let g:colorscheme_switcher_exclude = l:list
+        if len(l:defuncts)
+            let g:colorscheme_switcher_exclude = l:blacklist
             call colorscheme_manager#write()
 
             call xolox#misc#msg#info(
                         \ 'colorscheme-manager.vim %s: Pruned %s from blacklist (%i/%i)',
                         \ g:colorscheme_manager#version,
-                        \ substitute(string(l:pruned), '\[\|\]\|''', '', 'g'),
-                        \ len(l:pruned),
-                        \ len(l:blacklist))
+                        \ join(l:defuncts, ', '),
+                        \ len(l:defuncts),
+                        \ l:original_length)
         endif
     endif
 endfunction
@@ -201,13 +215,112 @@ function! colorscheme_manager#rem_blacklist(...)
 
         " Be nice and let the user know what happened
         call xolox#misc#msg#info(
-                    \ 'colorscheme-manager.vim %s: Removed color scheme %s to blacklist (%i)',
+                    \ 'colorscheme-manager.vim %s: Removed color scheme %s from blacklist (%i)',
                     \ g:colorscheme_manager#version,
                     \ l:color,
                     \ len(g:colorscheme_switcher_exclude))
         return 1
     endif
     return 0
+endfunction
+
+
+
+" Prune the shortlist of nonexistent colorschemes
+function! colorscheme_manager#prune_shortlist()
+    if exists('g:colorscheme_manager_shortlist') &&
+                \ len(g:colorscheme_manager_shortlist)
+        let l:shortlist = g:colorscheme_manager_shortlist
+        let l:original_length = len(l:shortlist)
+        let [shortlist, defuncts] = s:prune_colorschemes(l:shortlist)
+
+        " If we pruned any, update the global shortlist, write file, and
+        " message user
+        if len(l:defuncts)
+            let g:colorscheme_manager_shortlist = l:shortlist
+            call colorscheme_manager#write()
+
+            call xolox#misc#msg#info(
+                        \ 'colorscheme-manager.vim %s: Pruned %s from shortlist (%i/%i)',
+                        \ g:colorscheme_manager#version,
+                        \ join(l:defuncts, ', '),
+                        \ len(l:defuncts),
+                        \ l:original_length)
+        endif
+    endif
+endfunction
+
+
+
+" Add the current colorscheme to the shortlist
+function! colorscheme_manager#add_shortlist(...)
+    let l:color = a:0 ? a:1 : ( exists('g:colors_name') ? g:colors_name : '' )
+    " Check the variables exist, and that the scheme is not already in the
+    " shortlist
+    if strlen(l:color) &&
+                \ exists('g:colorscheme_manager_shortlist') &&
+                \ index(g:colorscheme_manager_shortlist, l:color) == -1
+
+        " add colorscheme to shortlist and sort it
+        call add(g:colorscheme_manager_shortlist, l:color)
+        call sort(g:colorscheme_manager_shortlist, 1)
+
+        " write the file
+        call colorscheme_manager#write()
+
+        " be nice and let the user know what happened
+        call xolox#misc#msg#info(
+                    \ 'colorscheme-manager.vim %s: Added color scheme %s to shortlist (%i/%i)',
+                    \ g:colorscheme_manager#version,
+                    \ l:color,
+                    \ index(g:colorscheme_manager_shortlist, l:color) + 1,
+                    \ len(g:colorscheme_manager_shortlist))
+        return 1
+    endif
+    return 0
+endfunction
+
+
+
+" Remove the current colorscheme from the shortlist
+function! colorscheme_manager#rem_shortlist(...)
+    let l:color = a:0 ? a:1 : ( exists('g:colors_name') ? g:colors_name : '' )
+    " Check the variables exist, and that the scheme is in the shortlist
+    if strlen(l:color) &&
+                \ exists('g:colorscheme_manager_shortlist') &&
+                \ index(g:colorscheme_manager_shortlist, l:color) != -1
+
+        " Remove the colorscheme from the shortlist and sort it
+        call filter(g:colorscheme_manager_shortlist, 'v:val != "'.l:color.'"')
+        call sort(g:colorscheme_manager_shortlist, 1)
+
+        " Write the file
+        call colorscheme_manager#write()
+
+        " Be nice and let the user know what happened
+        call xolox#misc#msg#info(
+                    \ 'colorscheme-manager.vim %s: Removed color scheme %s from shortlist (%i)',
+                    \ g:colorscheme_manager#version,
+                    \ l:color,
+                    \ len(g:colorscheme_switcher_exclude))
+        return 1
+    endif
+    return 0
+endfunction
+
+
+
+" Pick a random colorscheme neither in the blacklist nor in the shortlist
+function! colorscheme_manager#fresh_colorscheme()
+    let l:excludes = g:colorscheme_switcher_exclude
+    let g:colorscheme_switcher_exclude = g:colorscheme_switcher_exclude
+                \ + g:colorscheme_manager_shortlist
+    let l:choices = xolox#colorscheme_switcher#find_names()
+    let g:colorscheme_switcher_exclude = l:excludes
+    if exists('g:colors_name')
+        call filter(choices, 'v:val != g:colors_name')
+    endif
+    call xolox#colorscheme_switcher#random_among(choices)
 endfunction
 
 
@@ -235,6 +348,11 @@ function! colorscheme_manager#init()
         " If not set to load from last, or last is empty, load from file
         if !g:colorscheme_manager_global_last || !strlen(l:last)
             let l:last = l:data['last']
+        endif
+
+        " If the file's shortlist is not empty, load it
+        if len(l:data['shortlist'])
+            let g:colorscheme_manager_shortlist = l:data['shortlist']
         endif
 
         " We've read from the file, no need to do it again in this vim process

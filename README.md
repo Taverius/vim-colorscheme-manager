@@ -4,7 +4,8 @@ An add-on for [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme
 
 * Convenience functions for managing the colorscheme blacklist.
 * Automatically load last used colorscheme upon starting vim or (optionally) loading a session.
-* Store last used colorscheme and blacklist on file.
+* Manage a shortlist of favorite colorschemes, including the ability to switch to a random colorscheme from the shortlist.
+* Store last used colorscheme, blacklist, and shortlist on file.
 
 ## Author
 [Taverius](http://github.com/Taverius)
@@ -58,13 +59,37 @@ Optionally, takes a colorscheme name as an argument, and operates on that instea
 
 ### The `:BlacklistPruneColorScheme` command
 
-Removes non-existent (i.e. not in runtime path) colorschemes from blacklist.
+Remove non-existent (i.e. not in runtime path) colorschemes from the blacklist.
+
+### The `:ShortlistAddColorScheme` command
+
+Add the current colorscheme to the shortlist.
+
+Optionally, takes a colorscheme name as an argument, and operates on that instead of the current one.
+
+### The `:ShortlistRemColorScheme` command
+
+Remove the current colorscheme from the shortlist.
+
+Optionally, takes a colorscheme name as an argument, and operates on that instead of the current one.
+
+### The `:ShortlistPruneColorScheme` command
+
+Remove non-existent (i.e. not in runtime path) colorschemes from the shortlist.
+
+### The `:ShortlistRandomColorScheme` command
+
+Switch to a random colorscheme from the shortlist.
 
 ### The `:SwitchToColorScheme` command
 
 Syntactic sugar for `xolox#colorscheme_switcher#switch_to(colorscheme)`, takes a colorscheme name as argument.
 
 Useful for switching to a colorscheme you just installed with Vundle/NeoBundle/etc, or to use as custom command for a colorscheme browser - for example, [unite.vim](http://github.com/Shougo/unite.vim) with [unite-colorscheme](http://github.com/ujihisa/unite-colorscheme)
+
+### The `:FreshColorScheme` command
+
+Similar to `:RandomColorScheme` (from [vim-colorscheme-switcher](http://github.com/xolox/vim-colorscheme-switcher)), but switch to a random colorscheme that is neither in the blacklist nor in the shortlist.
 
 ## Options
 
