@@ -38,7 +38,9 @@ if !exists('g:colorscheme_manager_define_mappings')
     let g:colorscheme_manager_define_mappings = 1
 endif
 
-
+if !exists('g:colorscheme_manager_remember_background')
+    let g:colorscheme_manager_remember_background = 0
+endif
 
 " Define maps unless disabled
 if g:colorscheme_manager_define_mappings

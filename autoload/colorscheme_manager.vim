@@ -3,7 +3,7 @@
 " Last Change: June 26, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
-let g:colorscheme_manager#version = '0.0.7'
+let g:colorscheme_manager#version = '0.0.8'
 
 " Global variables
 " Saving and loading of colorscheme from global
@@ -36,7 +36,7 @@ if !exists('s:data_file')
     let s:data_file = ''
 endif
 if !exists('s:data_default')
-    let s:data_default = { 'last': '', 'blacklist': []}
+    let s:data_default = { 'lastbg': '', 'last': '', 'blacklist': []}
 endif
 
 
@@ -71,6 +71,7 @@ function! colorscheme_manager#write()
     let l:data = s:data_default
 
     " populate data
+    let l:data['lastbg'] = &background
     let l:data['last'] = exists('g:colors_name') ? g:colors_name : ''
     let l:data['blacklist'] = exists('g:colorscheme_switcher_exclude') ? g:colorscheme_switcher_exclude : []
 
@@ -216,6 +217,7 @@ endfunction
 function! colorscheme_manager#init()
     let l:data = s:data_default
     let l:last = ''
+    let l:lastbg = ''
 
     " Load last from global if set to do so
     if g:colorscheme_manager_global_last
@@ -237,8 +239,16 @@ function! colorscheme_manager#init()
             let l:last = l:data['last']
         endif
 
+        if !g:colorscheme_manager_global_last || strlen(l:lastbg)
+            let l:lastbg = l:data['lastbg']
+        endif
+
         " We've read from the file, no need to do it again in this vim process
         let s:data_loaded = 1
+    endif
+
+    if g:colorscheme_manager_remember_background && strlen(l:lastbg)
+        set background = l:lastbg
     endif
 
     " Is the last scheme used non-empty?
