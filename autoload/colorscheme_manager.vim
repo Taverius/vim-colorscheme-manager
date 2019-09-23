@@ -16,6 +16,9 @@ endif
 if !exists('g:ColorschemeManagerLast')
     let g:ColorschemeManagerLast = ''
 endif
+if !exists('g:ColorschemeManagerLastbg')
+    let g:ColorschemeManagerLastbg = ''
+endif
 " Cycle forward or backward on blacklist current colorscheme
 if !exists('g:colorscheme_manager_blacklist_direction')
     let g:colorscheme_manager_blacklist_direction = 1
@@ -78,6 +81,10 @@ function! colorscheme_manager#write()
     " Write to last to global if enabled
     if g:colorscheme_manager_global_last
         let g:ColorschemeManagerLast = l:data['last']
+    endif
+
+    if g:colorscheme_manager_global_last && g:colorscheme_manager_remember_background
+        let g:ColorschemeManagerLastbg = l:data['lastbg']
     endif
 
     " write to file
@@ -224,6 +231,10 @@ function! colorscheme_manager#init()
         let l:last = g:ColorschemeManagerLast
     endif
 
+    if g:colorscheme_manager_global_last && g:colorscheme_manager_remember_background
+        let l:lastbg = g:ColorschemeManagerLastbg
+    endif
+
     " Read from file
     if s:data_loaded == 0
         let s:data_file = colorscheme_manager#filename()
@@ -239,7 +250,7 @@ function! colorscheme_manager#init()
             let l:last = l:data['last']
         endif
 
-        if !g:colorscheme_manager_global_last || strlen(l:lastbg)
+        if !g:colorscheme_manager_global_last || !strlen(l:lastbg)
             let l:lastbg = l:data['lastbg']
         endif
 
@@ -248,7 +259,7 @@ function! colorscheme_manager#init()
     endif
 
     if g:colorscheme_manager_remember_background && strlen(l:lastbg)
-        set background = l:lastbg
+        execute 'set background='.l:lastbg
     endif
 
     " Is the last scheme used non-empty?
