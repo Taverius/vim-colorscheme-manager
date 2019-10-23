@@ -272,7 +272,7 @@ function! colorscheme_manager#init()
 
         if g:colorscheme_manager_start_random
             call xolox#colorscheme_switcher#random()
-        elseif
+        else
             call xolox#colorscheme_switcher#switch_to(l:last)
         endif
     endif
