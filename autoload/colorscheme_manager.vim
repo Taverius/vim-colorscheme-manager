@@ -270,7 +270,11 @@ function! colorscheme_manager#init()
         " Is the saved scheme not blacklisted?
         let l:last = !colorscheme_manager#check_blacklist(l:last) ? l:last : l:list[0]
 
-        call xolox#colorscheme_switcher#switch_to(l:last)
+        if g:colorscheme_manager_start_random
+            call xolox#colorscheme_switcher#random()
+        elseif
+            call xolox#colorscheme_switcher#switch_to(l:last)
+        endif
     endif
 endfunction
 
