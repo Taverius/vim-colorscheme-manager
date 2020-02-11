@@ -3,7 +3,7 @@
 " Last Change: June 26, 2014
 " URL: http://github.com/Taverius/vim-colorscheme-manager
 
-let g:colorscheme_manager#version = '0.0.7'
+let g:colorscheme_manager#version = '0.0.8'
 
 " Global variables
 " Saving and loading of colorscheme from global
@@ -15,6 +15,9 @@ if !exists('g:colorscheme_manager_global_last')
 endif
 if !exists('g:ColorschemeManagerLast')
     let g:ColorschemeManagerLast = ''
+endif
+if !exists('g:ColorschemeManagerLastbg')
+    let g:ColorschemeManagerLastbg = ''
 endif
 " Cycle forward or backward on blacklist current colorscheme
 if !exists('g:colorscheme_manager_blacklist_direction')
@@ -36,7 +39,7 @@ if !exists('s:data_file')
     let s:data_file = ''
 endif
 if !exists('s:data_default')
-    let s:data_default = { 'last': '', 'blacklist': []}
+    let s:data_default = { 'lastbg': '', 'last': '', 'blacklist': []}
 endif
 
 
@@ -71,12 +74,17 @@ function! colorscheme_manager#write()
     let l:data = s:data_default
 
     " populate data
+    let l:data['lastbg'] = &background
     let l:data['last'] = exists('g:colors_name') ? g:colors_name : ''
     let l:data['blacklist'] = exists('g:colorscheme_switcher_exclude') ? g:colorscheme_switcher_exclude : []
 
     " Write to last to global if enabled
     if g:colorscheme_manager_global_last
         let g:ColorschemeManagerLast = l:data['last']
+    endif
+
+    if g:colorscheme_manager_global_last && g:colorscheme_manager_remember_background
+        let g:ColorschemeManagerLastbg = l:data['lastbg']
     endif
 
     " write to file
@@ -216,10 +224,15 @@ endfunction
 function! colorscheme_manager#init()
     let l:data = s:data_default
     let l:last = ''
+    let l:lastbg = ''
 
     " Load last from global if set to do so
     if g:colorscheme_manager_global_last
         let l:last = g:ColorschemeManagerLast
+    endif
+
+    if g:colorscheme_manager_global_last && g:colorscheme_manager_remember_background
+        let l:lastbg = g:ColorschemeManagerLastbg
     endif
 
     " Read from file
@@ -237,8 +250,16 @@ function! colorscheme_manager#init()
             let l:last = l:data['last']
         endif
 
+        if !g:colorscheme_manager_global_last || !strlen(l:lastbg)
+            let l:lastbg = l:data['lastbg']
+        endif
+
         " We've read from the file, no need to do it again in this vim process
         let s:data_loaded = 1
+    endif
+
+    if g:colorscheme_manager_remember_background && strlen(l:lastbg)
+        execute 'set background='.l:lastbg
     endif
 
     " Is the last scheme used non-empty?
@@ -249,7 +270,11 @@ function! colorscheme_manager#init()
         " Is the saved scheme not blacklisted?
         let l:last = !colorscheme_manager#check_blacklist(l:last) ? l:last : l:list[0]
 
-        call xolox#colorscheme_switcher#switch_to(l:last)
+        if g:colorscheme_manager_start_random
+            call xolox#colorscheme_switcher#random()
+        else
+            call xolox#colorscheme_switcher#switch_to(l:last)
+        endif
     endif
 endfunction
 
